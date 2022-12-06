@@ -39,6 +39,7 @@ public class Main {
         ComunicationDevice device=new ComunicationDevice();
         device.listen("mjqjpqmgbljsphdztnvjfqwrcgsmlb");
         
+        //other testing exemples
         device.listen("bvwbjplbgvbhsrlpgdmjqwftvncz");
         device.listen("nppdvjthqldpwncqszvftbrmjlhg");
         device.listen("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg");
