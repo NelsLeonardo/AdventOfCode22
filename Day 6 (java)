@@ -1,25 +1,27 @@
 public class ComunicationDevice {
-    char[] frame= new char[4];
-    int StratingIndex;
-    int length;
+    int marker;
 
-    public ComunicationDevice(){}
+    public ComunicationDevice(int marker){
+        this.marker = marker;
+    }
 
     public void listen(String packet){
-        length=packet.length();
-        StratingIndex=0;
+        int length=packet.length();
+        int StratingIndex=0;
+        char[] frame= new char[marker];
 
         boolean found=false;
         int i=0;
         while(!found&&i<length-3) {
             found=true;
-            frame[0] = packet.charAt(i);
-            frame[1] = packet.charAt(i + 1);
-            frame[2] = packet.charAt(i + 2);
-            frame[3] = packet.charAt(i + 3);
+            int y=i;
+            for(int w = 0; w< marker; w++){
+                frame[w]=packet.charAt(y);
+                y+=1;
+            }
 
-            for(int j=0; j<4;j++){
-                for(int k=0; k<4; k++){
+            for(int j = 0; j< marker; j++){
+                for(int k = 0; k< marker; k++){
                     if(k!=j&&frame[k]==frame[j]){
                         found=false;
                     }
@@ -28,16 +30,16 @@ public class ComunicationDevice {
             if(found==false){StratingIndex++;}
             i++;
         }
-        StratingIndex+=4;
+        StratingIndex+= marker;
         System.out.println("Strating index of the data buffer "+packet+" founded after "+StratingIndex+" characters.");
     }
 }
+
 public class Main {
     public static void main(String[] args) {
         
         System.out.println("Advent Of Code: day 6");
-        ComunicationDevice device=new ComunicationDevice();
-        device.listen("mjqjpqmgbljsphdztnvjfqwrcgsmlb");
+        ComunicationDevice device=new ComunicationDevice(4); //in this case 4 is the starting marker (4 characters, all different from each other needed, before message starts)        device.listen("mjqjpqmgbljsphdztnvjfqwrcgsmlb");
         
         //other testing exemples
         device.listen("bvwbjplbgvbhsrlpgdmjqwftvncz");
