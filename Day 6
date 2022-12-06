@@ -1,0 +1,48 @@
+public class ComunicationDevice {
+    char[] frame= new char[4];
+    int StratingIndex;
+    int length;
+
+    public ComunicationDevice(){}
+
+    public void listen(String packet){
+        length=packet.length();
+        StratingIndex=0;
+
+        boolean found=false;
+        int i=0;
+        while(!found&&i<length-3) {
+            found=true;
+            frame[0] = packet.charAt(i);
+            frame[1] = packet.charAt(i + 1);
+            frame[2] = packet.charAt(i + 2);
+            frame[3] = packet.charAt(i + 3);
+
+            for(int j=0; j<4;j++){
+                for(int k=0; k<4; k++){
+                    if(k!=j&&frame[k]==frame[j]){
+                        found=false;
+                    }
+                }
+            }
+            if(found==false){StratingIndex++;}
+            i++;
+        }
+        StratingIndex+=4;
+        System.out.println("Strating index of the data buffer "+packet+" founded after "+StratingIndex+" characters.");
+    }
+}
+public class Main {
+    public static void main(String[] args) {
+        
+        System.out.println("Advent Of Code: day 6");
+        ComunicationDevice device=new ComunicationDevice();
+        device.listen("mjqjpqmgbljsphdztnvjfqwrcgsmlb");
+        
+        device.listen("bvwbjplbgvbhsrlpgdmjqwftvncz");
+        device.listen("nppdvjthqldpwncqszvftbrmjlhg");
+        device.listen("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg");
+        device.listen("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw");
+   
+   }
+}
