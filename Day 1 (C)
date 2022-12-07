@@ -5,9 +5,9 @@
 #include <stdbool.h>
 
 int main (int argc, char** argv){
-	if(argc!=2){printf("errore numero parametri insufficiente\n"); exit(1);}
+	if(argc!=2){printf("error: not enough parameters\n"); exit(1);}
 	int fd;
-	if((fd=open(argv[1], O_RDONLY))<0){printf("errore nella apertura del parametro passato\n"); exit(2);}
+	if((fd=open(argv[1], O_RDONLY))<0){printf("error: unable to open the file passed\n"); exit(2);}
 
 	char ch;
 	char calories[150];
