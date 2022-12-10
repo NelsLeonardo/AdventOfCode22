@@ -76,7 +76,65 @@ rm -dr $TMP
 rm $TMP1 $TMP2 $TMP3
 
 ########################################################################END#OF#FCS.sh########################################################################
+#!/bin/sh
 
+#FCS.sh fs (fs is the puzzle file with the filesystem description)
+
+case $# in
+0) echo error: not enough parameters; exit 1;;
+1);;
+*) echo error: to many parameters; exit 2;;
+esac
+
+CD=0
+LS=0
+DIR=0
+DATA=0
+
+cd tmp
+
+for i in `cat $1`
+do
+
+case $i in
+cd) 	CD=1;;
+ls) 	LS=1;;
+dir) 	DIR=1;;
+[0-9]*) DATA=$i;;
+$);;
+*)	if test $CD -eq 1
+	then
+		case $i in
+		/) cd ./;;
+		*)	cd $i
+			CD=0
+#			echo sono entrato in $i;;
+		esac
+	fi
+
+	if test $LS -eq 1
+	then
+		LS=0
+	fi
+
+	if test $DIR -eq 1
+	then
+		mkdir -v $i
+		DIR=0
+		#echo directory $i creata
+	fi
+
+	if test $DATA -ne 0
+	then
+		echo $DATA > $i
+		echo file $i creato con dimensione $DATA
+		DATA=0
+fi;;
+esac
+
+done
+
+########################################################################END#OF#FCP.sh########################################################################
 #!/bin/sh
 
 #FCR.sh tmp /tmp/AOCD7 /tmp/AOCD7b /tmp/AOCD7c
