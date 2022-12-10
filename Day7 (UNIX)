@@ -163,25 +163,6 @@ do
 			echo $RETVAL >> $2
 		fi
 		SUM=`expr $SUM + $RETVAL`
-
-
-#		SUM_CHILDREN=$SUM
-#		SUM=`expr $SUM_CHILDREN + $RETVAL`
-#		if test $SUM -gt 100000
-#		then
-#			if test $OUT_OF_BOUND -eq 0
-#			then
-#				echo $SUM_CHILDREN >> $2
-#				OUT_OF_BOUND=1
-#			fi
-#			if test $OUT_OF_BOUND -eq 1
-#			then
-#				if test $RETVAL -le 100000
-#				then
-#					echo $RETVAL >> $2
-#				fi
-#			fi
-#		fi
 	fi
 done
 
