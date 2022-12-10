@@ -1,0 +1,143 @@
+#!/bin/sh
+
+#FCS.sh fs (fs is the puzzle file with the filesystem description)
+
+#---------------------------------------
+TMP=tmp
+TMP1=/tmp/AOCD7
+TMP2=/tmp/AOCD7b
+TMP3=/tmp/AOCD7c
+
+TOTAL=0
+SUM=0
+FILESYSTEM=70000000
+FREESPACE=0
+SPACEREQUIRED=30000000
+SPACENEEDED=0
+BEST=0
+DIRSIZE=0
+
+#---------------------------------------
+
+case $# in
+0) echo error: not enough parameters; exit 1;;
+1);;
+*) echo error: too many parameters; exit 2;;
+esac
+
+mkdir tmp
+
+./FCP.sh ../$1
+
+> $TMP1
+echo 0 > $TMP2
+echo 0 > $TMP3
+
+./FCR.sh $TMP $TMP1 $TMP2 $TMP3
+
+SUM=
+
+for i in `cat /tmp/AOCD7`
+do
+
+SUM=`expr $SUM + $i`
+
+done
+
+echo ---------------------------------------------------------------
+echo
+echo ALL DIRECTORY WITH LESS THEN 100000 IN SIZE SUMMED: $SUM
+echo
+
+TOTAL=`cat /tmp/AOCD7b`
+echo TOTAL FILE USED: $TOTAL
+
+FREESPACE=`expr $FILESYSTEM - $TOTAL`
+echo AVAIABLE SPACE: $FREESPACE
+
+SPACENEEDED=`expr $SPACEREQUIRED - $FREESPACE`
+echo $SPACENEEDED OF SPACE IS REQUIRED
+
+BEST=$TOTAL
+for i in `cat /tmp/AOCD7c`
+do
+	if test $i -ge $SPACENEEDED
+	then
+		if test $i -lt $BEST
+		then
+			BEST=$i
+		fi
+	fi
+done
+echo
+echo THE SAFEST DIRECTORY TO DELETE HAS SIZE: $BEST
+
+rm -dr $TMP
+rm $TMP1 $TMP2 $TMP3
+
+########################################################################END#OF#FCS.sh########################################################################
+
+#!/bin/sh
+
+#FCR.sh tmp /tmp/AOCD7 /tmp/AOCD7b /tmp/AOCD7c
+
+#------------------------------------
+RETVAL=0
+SUM_CHILDREN=0
+SUM=0
+SUM_DIR=0
+OUT_OF_BOUND=0
+VALUE=0
+
+#------------------------------------
+
+cd $1
+
+for i in *
+do
+	if test -d $i -a -x $i
+	then
+		/home/leo/AdventOfCode22/day7/FCR.sh $i $2 $3 $4
+		RETVAL=`cat $3`
+		#checkfase
+		if test $RETVAL -le 100000
+		then
+			echo $RETVAL >> $2
+		fi
+		SUM=`expr $SUM + $RETVAL`
+
+
+#		SUM_CHILDREN=$SUM
+#		SUM=`expr $SUM_CHILDREN + $RETVAL`
+#		if test $SUM -gt 100000
+#		then
+#			if test $OUT_OF_BOUND -eq 0
+#			then
+#				echo $SUM_CHILDREN >> $2
+#				OUT_OF_BOUND=1
+#			fi
+#			if test $OUT_OF_BOUND -eq 1
+#			then
+#				if test $RETVAL -le 100000
+#				then
+#					echo $RETVAL >> $2
+#				fi
+#			fi
+#		fi
+	fi
+done
+
+for i in *
+do
+	if test -f $i -a -r $i
+	then
+		#addfile
+		VALUE=`cat $i`
+		SUM=`expr $SUM + $VALUE`
+	fi
+done
+
+echo $SUM > $3
+echo $SUM >> $4
+
+########################################################################END#OF#FCR.sh########################################################################
