@@ -1,0 +1,103 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <stdbool.h>
+
+//PART 1
+//A=ROCK		X		1
+//B=PAPER		Y		2
+//C=SCISSOR		Z		3
+
+int rockPaperScissor(char ABC, char XYZ) {
+
+	//winCase
+	if (ABC == 'A' && XYZ == 'Y' || ABC == 'B' && XYZ == 'Z' || ABC == 'C' && XYZ == 'X') { return 1; }
+
+	//lossCase
+	if (ABC == 'A' && XYZ == 'Z' || ABC == 'B' && XYZ == 'X' || ABC == 'C' && XYZ == 'Y') { return 0; }
+
+	//drawCase
+	if (ABC == 'A' && XYZ == 'X' || ABC == 'B' && XYZ == 'Y' || ABC == 'C' && XYZ == 'Z') { return 2; }
+
+	return 255;
+}
+
+int game1(char* fd) {
+	char ch, ABC, XYZ;
+	int res;
+	int points=0;
+	int i=1;
+
+	while (read(fd, &ABC, 1)) {
+		//printf("Round %d!\n", i);
+		if ((read(fd, &ch, 1)) != 1) { printf("error: nothing to read\n"); exit(2); }
+		if ((read(fd, &XYZ, 1)) != 1) { printf("error: nothing to read\n"); exit(2); }
+		if ((res = rockPaperScissor(ABC, XYZ)) == 255) { printf("error: nor win, nor loss, nor draw\n"); exit(3); }
+		if ((read(fd, &ch, 1)) != 1) { printf("error: nothing to read\n"); exit(2); }
+
+		if (res == 1) { points += 6; }
+		else { 
+			if (res == 2) { points += 3; } 
+		}
+		if (XYZ == 'X') { points += 1; }
+		if (XYZ == 'Y') { points += 2; }
+		if (XYZ == 'Z') { points += 3; }
+		i++;
+	}
+
+	return points;
+}
+
+//PART 2
+//A=ROCK		1		X=LOSS
+//B=PAPER		2		Y=DRAW
+//C=SCISSOR		3		Z=WIN
+
+int game2(char* fd) {
+	char ch, ABC, XYZ;
+	int res;
+	int points = 0;
+	int i = 1;
+
+	while (read(fd, &ABC, 1)) {
+		if ((read(fd, &ch, 1)) != 1) { printf("error: nothing to read\n"); exit(2); }
+		if ((read(fd, &XYZ, 1)) != 1) { printf("error: nothing to read\n"); exit(2); }
+		if ((read(fd, &ch, 1)) != 1) { printf("error: nothing to read\n"); exit(2); }
+
+		if (XYZ == 'X') { points += 0; }
+		if (XYZ == 'Y') { points += 3; }
+		if (XYZ == 'Z') { points += 6; }
+		if (ABC == 'C' && XYZ == 'Z') { points += 1; }
+		if (ABC == 'A' && XYZ == 'Z') { points += 2; }
+		if (ABC == 'B' && XYZ == 'Z') { points += 3; }
+		if (ABC == 'A' && XYZ == 'Y') { points += 1; }
+		if (ABC == 'B' && XYZ == 'Y') { points += 2; }
+		if (ABC == 'C' && XYZ == 'Y') { points += 3; }
+		if (ABC == 'A' && XYZ == 'X') { points += 3; }
+		if (ABC == 'B' && XYZ == 'X') { points += 1; }
+		if (ABC == 'C' && XYZ == 'X') { points += 2; }
+		
+		i++;
+	}
+
+	return points;
+}
+
+int main(int argc, char** argv) {
+
+	int fd;
+	int points;
+	
+	if (argc != 2) { printf("error: wrong number of params\n"); exit(1); }
+	if ((fd = open(argv[1], O_RDONLY)) < 0) { printf("error: unable to open the file\n"); exit(2); }
+
+	points=game1(fd);
+	printf("You scored a total of %d points\n", points);
+	close(fd);
+
+	if ((fd = open(argv[1], O_RDONLY)) < 0) { printf("error: unable to open the file\n"); exit(4); }
+	points = game2(fd);
+	printf("You scored a total of %d points\n", points);
+
+	return 0;
+}
