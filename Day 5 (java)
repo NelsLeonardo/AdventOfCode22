@@ -49,7 +49,7 @@ public class Crane {
                             started = true;
                         }
                     }
-                    if(line.charAt(i)=='f'){
+                    if(isDigit(line.charAt(i))&&from){
                         quantitified=true;
                     }
                     j++;
@@ -156,7 +156,7 @@ public class Crane {
                             started = true;
                         }
                     }
-                    if(line.charAt(i)=='f'){
+                    if(isDigit(line.charAt(i))&&from){
                         quantitified=true;
                     }
                     j++;
