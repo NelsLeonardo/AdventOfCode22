@@ -1,0 +1,113 @@
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Map {
+    File file;
+
+    public ArrayList<String> Mapper(File file){
+        ArrayList<String> map=new ArrayList<>();
+        this.file=file;
+
+        try {
+            Scanner sc = new Scanner(file);
+            while(sc.hasNextLine()){
+                String line=sc.nextLine();
+                map.add(line);
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return map;
+    }
+}
+
+
+import java.util.ArrayList;
+
+public class Viewer {
+    ArrayList<String> map=new ArrayList<>();
+
+    public void isVisible(ArrayList<String> map){
+        this.map=map;
+        int count=0;
+        int UP=0, DW=0, LT=0, RT=0;
+        int BestScore=0;
+
+        int J=0;
+        for (String ROW:map) {
+            int length=ROW.length();
+            for(int i=0; i<length; i++){
+                int tree =ROW.charAt(i)-48;
+                boolean Uvis=true, Dvis=true, Rvis=true, Lvis=true;
+
+                UP=0; DW=0; LT=0; RT=0;     //for PART 2
+
+                for(int j=0; j<length; j++){
+                    int trees = ROW.charAt(j)-48;
+                    if(j<i&&trees>=tree){Lvis=false;}
+                    if(j>i&&trees>=tree){Rvis=false;}
+                }
+                int j=0;
+                for (String row:map) {
+                    int trees = row.charAt(i)-48;
+                    if(j<J&&trees>=tree){Uvis=false;}
+                    if(j>J&&trees>=tree){Dvis=false;}
+                    j++;
+                }
+                if(Uvis||Dvis||Lvis||Rvis){
+                    count++;
+
+                    //PART 2
+                    for(int x=i-1; x>=0; x--){
+                        if(x<0){break;}
+                        int tr=ROW.charAt(x)-48;
+                        if(tr>=tree){LT++;break;}
+                        LT++;
+                    }
+                    for(int x=i+1; x<length; x++){
+                        int tr=ROW.charAt(x)-48;
+                        if(tr>=tree){RT++; break;}
+                        RT++;
+                    }
+                    int last = map.size();
+                    for(int Y=J+1; Y<last; Y++){
+                        String str=map.get(Y);
+                        int tr=str.charAt(i)-48;
+                        if(tr>=tree){DW++; break;}
+                        DW++;
+                    }
+                    for(int Y=J-1; Y>=0; Y--){
+                        String str=map.get(Y);
+                        int tr=str.charAt(i)-48;
+                        if(tr>=tree){UP++; break;}
+                        UP++;
+                    }
+
+                    int score=UP*DW*LT*RT;
+                    if(score>BestScore){BestScore=score;}   //end of PART 2
+                }
+            }
+            J++;
+        }
+        System.out.println("[PART 1] Total number of visible trees="+count);
+        System.out.println("[PART 2] Best Scenic score possible="+BestScore);
+    }
+}
+
+
+import java.io.File;
+import java.util.ArrayList;
+
+public class Main {
+    public static void main(String[] args) {
+        File file=new File("C:\\Users\\LeoNe\\IdeaProjects\\AdventOfCode22_day8\\Map.txt");
+        Map mapper=new Map();
+        ArrayList<String> map;
+        map=mapper.Mapper(file);
+        Viewer viewer=new Viewer();
+        viewer.isVisible(map);
+
+    }
+}
