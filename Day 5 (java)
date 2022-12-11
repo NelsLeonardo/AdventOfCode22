@@ -1,0 +1,265 @@
+public class CommandLine {
+    String name;
+    String cargo;
+    public CommandLine(String name, String cargo){
+        this.name=name;
+        this.cargo=cargo;
+    }
+}
+
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Scanner;
+import static java.lang.Character.isDigit;
+
+public class Crane {
+
+    ArrayList <CommandLine> list=new ArrayList<>();
+
+    public Crane(ArrayList<CommandLine> list){
+        this.list=list;
+    }
+
+    public void movement9001(File file){
+        try {
+            Scanner sc = new Scanner(file);     //file to be scanned
+            int length;
+
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();    //System.out.println(line); //for any String of the file
+                length=line.length();
+                boolean started=false;
+                int quantity=0;
+                boolean quantitified=false;
+                String src="s";
+                boolean from=false;
+                String dest="s";
+
+                for(int i=0; i<length; i++){
+                    //looking for the ammount to move
+                    int j=0;
+                    if(isDigit(line.charAt(i))&&started&&!quantitified&&!from){
+                        quantity=quantity*10;
+                        quantity+=line.charAt(i)-48;
+                    }
+                    else{
+                        if(isDigit(line.charAt(i))&&!started&&!quantitified&&!from) {
+                            quantity = line.charAt(i)-48;
+                            started = true;
+                        }
+                    }
+                    if(line.charAt(i)=='f'){
+                        quantitified=true;
+                    }
+                    j++;
+
+                    //looking for the destination
+                    if(isDigit(line.charAt(i))&&from){
+                        dest+=line.charAt(i);
+                    }
+
+                    //looking for the source
+                    if(isDigit(line.charAt(i))&&quantitified&&!from){
+                        src+=line.charAt(i);
+                        from=true;
+                    }
+                }
+
+                //ready to move
+                //set tmp
+                String tmpS="";
+                String tmpD="";
+                //loading tmp
+                for (CommandLine cmd: list) {
+                    if(cmd.name.compareTo(src)==0){
+                        if(cmd.cargo.length()<quantity){System.out.println("error: not enough crates in "+cmd.name); System.out.println(cmd.cargo.length()+"<"+quantity); break;}
+
+                        int id= list.indexOf(cmd);
+                        tmpS=list.get(id).cargo;
+                    }
+                    if(cmd.name.compareTo(dest)==0){
+                        int id= list.indexOf(cmd);
+                        tmpD=list.get(id).cargo;
+                    }
+                }
+
+                //modify tmp
+                String reversable="";
+                for(int i=tmpS.length()-1; i>=tmpS.length()-quantity; i--){
+                    char ch=tmpS.charAt(i);
+                    String str=String.valueOf(ch);
+                    reversable+=str;
+                }
+                char rev[]=reversable.toCharArray();
+                for(int i=reversable.length()-1; i>=0; i--){
+                    String str=String.valueOf(rev[i]);
+                    tmpD+=str;
+                }
+                String newSrc="";
+                for(int i=0; i<tmpS.length()-quantity;i++){
+                    char ch = tmpS.charAt(i);
+                    String str=String.valueOf(ch);
+                    newSrc+=str;
+                }
+
+                //replace cargo
+                int i=0;
+                for (CommandLine cmd: list) {
+                    if(cmd.name.compareTo(src)==0){
+                        cmd.cargo=newSrc;
+                    }
+                    if(cmd.name.compareTo(dest)==0){
+                        cmd.cargo=tmpD;
+                    }
+                    i++;
+                }
+            }
+
+            //Print of part 2 solution
+            System.out.println("[Part 2] On top of each stack are the following crates");
+            for (CommandLine cmd:list) {
+                int i=cmd.cargo.length();
+                char ch=cmd.cargo.charAt(i-1);
+                System.out.println(cmd.name+": "+ch);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void movement9000(File file){
+        try {
+            Scanner sc = new Scanner(file);     //file to be scanned
+            int length;
+
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();    //System.out.println(line); //for any String of the file
+                length=line.length();
+                boolean started=false;
+                int quantity=0;
+                boolean quantitified=false;
+                String src="s";
+                boolean from=false;
+                String dest="s";
+
+                for(int i=0; i<length; i++){
+                    //looking for the ammount to move
+                    int j=0;
+                    if(isDigit(line.charAt(i))&&started&&!quantitified&&!from){
+                        quantity=quantity*10;
+                        quantity+=line.charAt(i)-48;
+                    }
+                    else{
+                        if(isDigit(line.charAt(i))&&!started&&!quantitified&&!from) {
+                            quantity = line.charAt(i)-48;
+                            started = true;
+                        }
+                    }
+                    if(line.charAt(i)=='f'){
+                        quantitified=true;
+                    }
+                    j++;
+
+                    //looking for the destination
+                    if(isDigit(line.charAt(i))&&from){
+                        dest+=line.charAt(i);
+                    }
+
+                    //looking for the source
+                    if(isDigit(line.charAt(i))&&quantitified&&!from){
+                        src+=line.charAt(i);
+                        from=true;
+                    }
+                }
+
+                //ready to move
+                //set tmp
+                String tmpS="";
+                String tmpD="";
+                //loading tmp
+                for (CommandLine cmd: list) {
+                    if(cmd.name.compareTo(src)==0){
+                        if(cmd.cargo.length()<quantity){System.out.println("error: not enough crates in "+cmd.name); System.out.println(cmd.cargo.length()+"<"+quantity); break;}
+
+                        int id= list.indexOf(cmd);
+                        tmpS=list.get(id).cargo;
+                    }
+                    if(cmd.name.compareTo(dest)==0){
+                        int id= list.indexOf(cmd);
+                        tmpD=list.get(id).cargo;
+                    }
+                }
+
+                //modify tmp
+                for(int i=tmpS.length()-1; i>=tmpS.length()-quantity; i--){
+                    char ch=tmpS.charAt(i);
+                    String str=String.valueOf(ch);
+                    tmpD+=str;
+                }
+                String newSrc="";
+                for(int i=0; i<tmpS.length()-quantity;i++){
+                    char ch = tmpS.charAt(i);
+                    String str=String.valueOf(ch);
+                    newSrc+=str;
+                }
+
+                //replace cargo
+                int i=0;
+                for (CommandLine cmd: list) {
+                    if(cmd.name.compareTo(src)==0){
+                        cmd.cargo=newSrc;
+                    }
+                    if(cmd.name.compareTo(dest)==0){
+                        cmd.cargo=tmpD;
+                    }
+                    i++;
+                }
+            }
+
+            //Print of part 1 solution
+            System.out.println("[Part 1] On top of each stack are the following crates");
+            for (CommandLine cmd:list) {
+                int i=cmd.cargo.length();
+                char ch=cmd.cargo.charAt(i-1);
+                System.out.println(cmd.name+": "+ch);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+import java.io.File;
+import java.util.ArrayList;
+
+public class Main {
+    public static void main(String[] args) {
+        File file=new File("C:\\Users\\LeoNe\\IdeaProjects\\AdventOfCode22_day5\\Crane.txt");
+        ArrayList<CommandLine> list=new ArrayList();
+        CommandLine s1=new CommandLine("s1","ZPMHR"); list.add(s1);
+        CommandLine s2=new CommandLine("s2","PCJB");list.add(s2);
+        CommandLine s3=new CommandLine("s3","SNHGLCD");list.add(s3);
+        CommandLine s4=new CommandLine("s4","FTMDQSRL");list.add(s4);
+        CommandLine s5=new CommandLine("s5","FSPQBTZM");list.add(s5);
+        CommandLine s6=new CommandLine("s6","TFSZBG");list.add(s6);
+        CommandLine s7=new CommandLine("s7","NRV");list.add(s7);
+        CommandLine s8=new CommandLine("s8","PGLTDVCM");list.add(s8);
+        CommandLine s9=new CommandLine("s9","WQNJFML");list.add(s9);
+
+        Crane crane=new Crane(list);
+        crane.movement9001(file);
+    }
+}
+
+/*                              [L] [M]         [M]
+                            [D] [R] [Z]         [C] [L]
+                            [C] [S] [T] [G]     [V] [M]
+                    [R]     [L] [Q] [B] [B]     [D] [F]
+                    [H] [B] [G] [D] [Q] [Z]     [T] [J]
+                    [M] [J] [H] [M] [P] [S] [V] [L] [N]
+                    [P] [C] [N] [T] [S] [F] [R] [G] [Q]
+                    [Z] [P] [S] [F] [F] [T] [N] [P] [W]
+                     1   2   3   4   5   6   7   8   9
+ */
