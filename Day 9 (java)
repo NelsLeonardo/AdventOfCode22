@@ -203,11 +203,11 @@ import java.io.File;
 
 public class Main {
     public static void main(String[] args) {
-        File file=new File("C:\\Users\\LeoNe\\IdeaProjects\\AdventOfCode22_day9\\Bridge.txt");
+        File file=new File("[FILE DIRECTORY]\\Bridge.txt");
         Bridge bridge=new Bridge();
         bridge.headTail(file);
 
-        File filePart2=new File("C:\\Users\\LeoNe\\IdeaProjects\\AdventOfCode22_day9\\Bridge.txt");
+        File filePart2=new File("[FILE DIRECTORY]\\Bridge.txt");
         bridge.knots(filePart2, 8);
     }
 }
