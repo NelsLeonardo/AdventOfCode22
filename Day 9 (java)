@@ -1,0 +1,213 @@
+public class Position {
+    int X;
+    int Y;
+    int count;
+
+    public Position(int X, int Y){
+        this.X=X;
+        this.Y=Y;
+        count=0;
+    }
+}
+
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Bridge {
+    //tail position
+    int X=0; int Y=5;
+    //head position
+    int Hx=0; int Hy=5;
+
+    public void positionUpdate(int X, int Y, ArrayList<Position> memory){
+        boolean newPosition=true;
+        for (Position position: memory) {
+            if(position.X==X&&position.Y==Y){
+                position.count++;
+                newPosition=false;
+            }
+        }
+        if(newPosition){
+            Position tmp=new Position(X, Y);
+            memory.add(tmp);
+        }
+    }
+    public void headTail(File file){
+        //memory
+        ArrayList<Position> memory=new ArrayList<>();
+        Position start=new Position(this.X, this.Y); memory.add(start);
+
+        try {
+            Scanner sc = new Scanner(file);
+            while(sc.hasNextLine()){
+                String line=sc.nextLine();
+
+                char dir=line.charAt(0);
+                int steps=0;
+                int length=line.length();
+                for(int i=2; i<length; i++){
+                    if(i==2){
+                        steps=line.charAt(i)-48;
+                    }else{
+                        steps*=10;
+                        steps=steps+line.charAt(i)-48;
+                    }
+                }
+                //System.out.println(dir+" "+steps);
+                for(int i=0; i<steps;i++){
+                    if(dir=='R'){Hx++;}
+                    if(dir=='L'){Hx--;}
+                    if(dir=='U'){Hy--;}
+                    if(dir=='D'){Hy++;}
+                    //check for a right movement
+                    if(Hx-X==2&&Hy==Y){X++; this.positionUpdate(this.X, this.Y, memory);}
+                    //check for a left movement
+                    if(X-Hx==2&&Hy==Y){X--; this.positionUpdate(this.X, this.Y, memory);}
+                    //check for an up movement
+                    if(Y-Hy==2&&Hx==X){Y--; this.positionUpdate(this.X, this.Y, memory);}
+                    //check for a down movement
+                    if(Hy-Y==2&&Hx==X){Y++; this.positionUpdate(this.X, this.Y, memory);}
+                    //now the hard one: diagonal movement
+                    if(Y-Hy==2){
+                        if(Hx-X==1){X++; Y--; this.positionUpdate(this.X, this.Y, memory);}
+                        if(X-Hx==1){X--; Y--; this.positionUpdate(this.X, this.Y, memory);}
+                    }
+                    if(Hy-Y==2){
+                        if(Hx-X==1){X++; Y++; this.positionUpdate(this.X, this.Y, memory);}
+                        if(X-Hx==1){X--; Y++; this.positionUpdate(this.X, this.Y, memory);}
+                    }
+                    if(X-Hx==2){
+                        if(Hy-Y==1){X--; Y++; this.positionUpdate(this.X, this.Y, memory);}
+                        if(Y-Hy==1){X--; Y--; this.positionUpdate(this.X, this.Y, memory);}
+                    }
+                    if(Hx-X==2){
+                        if(Hy-Y==1){X++; Y++; this.positionUpdate(this.X, this.Y, memory);}
+                        if(Y-Hy==1){X++; Y--; this.positionUpdate(this.X, this.Y, memory);}
+                    }
+                }
+            }
+            System.out.println("[PART 1] Positions visited at least once="+memory.size());
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Position Movement(int PreX, int PreY, int X, int Y){
+        Position ret=new Position(X, Y);
+        //check for a right movement
+        if(PreX-ret.X==2&&PreY==ret.Y){ret.X++;}
+        //check for a left movement
+        if(ret.X-PreX==2&&PreY==ret.Y){ret.X--;}
+        //check for an up movement
+        if(ret.Y-PreY==2&&PreX==ret.X){ret.Y--;}
+        //check for a down movement
+        if(PreY-ret.Y==2&&PreX==ret.X){ret.Y++;}
+        //now the hard one: diagonal movement
+        if(ret.Y-PreY==2){
+            if(PreX-ret.X==1){ret.X++; ret.Y--;}
+            if(ret.X-PreX==1){ret.X--; ret.Y--;}
+        }
+        if(PreY-ret.Y==2){
+            if(PreX-ret.X==1){ret.X++; ret.Y++;}
+            if(ret.X-PreX==1){ret.X--; ret.Y++;}
+        }
+        if(ret.X-PreX==2){
+            if(PreY-ret.Y==1){ret.X--; ret.Y++;}
+            if(ret.Y-PreY==1){ret.X--; ret.Y--;}
+        }
+        if(PreX-ret.X==2){
+            if(PreY-ret.Y==1){ret.X++; ret.Y++;}
+            if(ret.Y-PreY==1){ret.X++; ret.Y--;}
+        }
+        //diagonal PART 2
+        if(ret.Y-PreY==2){
+            if(PreX-ret.X==2){ret.X++; ret.Y--;}
+            if(ret.X-PreX==2){ret.X--; ret.Y--;}
+        }
+        if(PreY-ret.Y==2){
+            if(PreX-ret.X==2){ret.X++; ret.Y++;}
+            if(ret.X-PreX==2){ret.X--; ret.Y++;}
+        }
+        if(ret.X-PreX==2){
+            if(PreY-ret.Y==2){ret.X--; ret.Y++;}
+            if(ret.Y-PreY==2){ret.X--; ret.Y--;}
+        }
+        if(PreX-ret.X==2){
+            if(PreY-ret.Y==2){ret.X++; ret.Y++;}
+            if(ret.Y-PreY==2){ret.X++; ret.Y--;}
+        }
+        return ret;
+    }
+    public void knots(File file, int knots){
+        ArrayList<Position> Kmemory=new ArrayList<>();
+        Hx=0; Hy=5;
+        Position start=new Position(Hx, Hy); Kmemory.add(start);
+        ArrayList<Position> KNOTS=new ArrayList<>();
+        Position head=new Position(Hx, Hy); KNOTS.add(head);
+        Position k1=new Position(Hx, Hy); KNOTS.add(k1);
+        Position k2=new Position(Hx, Hy); KNOTS.add(k2);
+        Position k3=new Position(Hx, Hy); KNOTS.add(k3);
+        Position k4=new Position(Hx, Hy); KNOTS.add(k4);
+        Position k5=new Position(Hx, Hy); KNOTS.add(k5);
+        Position k6=new Position(Hx, Hy); KNOTS.add(k6);
+        Position k7=new Position(Hx, Hy); KNOTS.add(k7);
+        Position k8=new Position(Hx, Hy); KNOTS.add(k8);
+        Position tail=new Position(Hx, Hy); KNOTS.add(tail);
+
+        try {
+            Scanner sc = new Scanner(file);
+            while(sc.hasNextLine()){
+                String line=sc.nextLine();
+
+                char dir=line.charAt(0);
+                int steps=0;
+                int length=line.length();
+                for(int i=2; i<length; i++){
+                    if(i==2){
+                        steps=line.charAt(i)-48;
+                    }else{
+                        steps*=10;
+                        steps=steps+line.charAt(i)-48;
+                    }
+                }
+                for(int i=0; i<steps;i++) {
+                    for(Position KNOT: KNOTS){
+                        if(KNOTS.indexOf(KNOT)==0){
+                            if(dir=='R'){KNOT.X++;}
+                            if(dir=='L'){KNOT.X--;}
+                            if(dir=='U'){KNOT.Y--;}
+                            if(dir=='D'){KNOT.Y++;}
+                        }else {
+                            int OldKnotInex=KNOTS.indexOf(KNOT)-1;
+                            Position OldKnot=KNOTS.get(OldKnotInex);
+                            Position tmp = Movement(OldKnot.X, OldKnot.Y ,KNOT.X, KNOT.Y);
+                            KNOT.X=tmp.X; KNOT.Y=tmp.Y;
+                        }
+                    }
+                    Position TAIL=KNOTS.get(9);
+                    positionUpdate(TAIL.X, TAIL.Y, Kmemory);
+                }
+            }
+            System.out.println("[PART 2] Positions visited at least once="+Kmemory.size());
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+
+
+import java.io.File;
+
+public class Main {
+    public static void main(String[] args) {
+        File file=new File("C:\\Users\\LeoNe\\IdeaProjects\\AdventOfCode22_day9\\Bridge.txt");
+        Bridge bridge=new Bridge();
+        bridge.headTail(file);
+
+        File filePart2=new File("C:\\Users\\LeoNe\\IdeaProjects\\AdventOfCode22_day9\\Bridge.txt");
+        bridge.knots(filePart2, 8);
+    }
+}
