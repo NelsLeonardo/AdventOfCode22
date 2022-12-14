@@ -47,10 +47,9 @@ public class Map {
 import java.util.ArrayList;
 
 public class Viewer {
-    ArrayList<String> map=new ArrayList<>();
 
     public void isVisible(ArrayList<String> map){
-        this.map=map;
+        //this.map=map;
         int count=0;
         int UP=0, DW=0, LT=0, RT=0;
         int BestScore=0;
@@ -114,7 +113,7 @@ public class Viewer {
         System.out.println("[PART 1] Total number of visible trees="+count);
         System.out.println("[PART 2] Best Scenic score possible="+BestScore);
     }
-    
+
     public void isVisibleFOREACH(ArrayList<ArrayList<Integer>>imap){
         int count=0;
 
