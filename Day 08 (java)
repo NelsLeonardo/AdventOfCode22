@@ -49,7 +49,6 @@ import java.util.ArrayList;
 public class Viewer {
 
     public void isVisible(ArrayList<String> map){
-        //this.map=map;
         int count=0;
         int UP=0, DW=0, LT=0, RT=0;
         int BestScore=0;
