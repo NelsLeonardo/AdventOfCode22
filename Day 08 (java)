@@ -1,3 +1,5 @@
+https://adventofcode.com/2022/day/8
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -49,6 +51,7 @@ import java.util.ArrayList;
 public class Viewer {
 
     public void isVisible(ArrayList<String> map){
+        //this.map=map;
         int count=0;
         int UP=0, DW=0, LT=0, RT=0;
         int BestScore=0;
@@ -105,6 +108,7 @@ public class Viewer {
 
                     int score=UP*DW*LT*RT;
                     if(score>BestScore){BestScore=score;}   //end of PART 2
+                    //System.out.println(i+" "+ROW.charAt(i)+": "+UP+" "+DW+" "+LT+" "+RT);
                 }
             }
             J++;
@@ -115,6 +119,7 @@ public class Viewer {
 
     public void isVisibleFOREACH(ArrayList<ArrayList<Integer>>imap){
         int count=0;
+        int sum, BestScore=0;  //for PART 2
 
         int v=0;
         for(ArrayList<Integer> line:imap){
@@ -124,40 +129,78 @@ public class Viewer {
                 boolean isVisibleR=true;
                 boolean isVisibleU=true;
                 boolean isVisibleD=true;
+                int UP=0, DW=0, LT=0, RT=0; //for PART 2
                 int j=0;
                 for(int B:line){
-                    if(j>i&&B>=A){
-                        isVisibleR=false;
+                    if(j>i){                //right check
+                        if(isVisibleR){     //not found any higher tree yet 
+                            if(B>=A){       //found one
+                                isVisibleR=false;   //set variable to found position
+                                RT++;
+                            }else{
+                                RT++;       //counter of any lower tree before hitting an higher one
+                            }
+                        }
                     }
-                    if(j<i&&B>=A){
-                        isVisibleL=false;
+                    if(j<i){                //left check
+                        if(isVisibleL){     //not found any higher tree yet 
+                            if(B>=A){       //found one
+                                isVisibleL=false;   //set variable to found position
+                            }
+                        }
+                        if(B>=A){           //this time is different (we can olny go left to right and doing so we cant know how the next tree will be)
+                            LT=1;           //each time we encounter an higher tree we'll reset the counter
+                        }else{              //doing so we can count the number of tree between the last higher and the starting one
+                            LT++;           //[last higher tree<A]
+                        }
                     }
                     j++;
                 }
 
                 int w=0;
-                for(ArrayList<Integer> vline:imap){
-                    j=0;
-                    for(int B:vline){
-                        if(i==j&&w>v&&B>=A){
-                            isVisibleD=false;
-                        }
-                        if(i==j&&w<v&&B>=A){
-                            isVisibleU=false;
+                for(ArrayList<Integer> vline:imap){     //for the vertical check is pretty much the same
+                    j=0;                                //using 2 foreach (one for the array of arrays and one for each line of each array)
+                    for(int B:vline){                   //we can ceck every line(array of Integer) locking the column of our tree (A) (i==j)
+                        if(i==j){
+                            if(w>v){
+                                if(isVisibleD) {
+                                    if (B >= A) {
+                                        isVisibleD = false;
+                                        DW++;
+                                    }else{
+                                        DW++;
+                                    }
+                                }
+                            }
+                            if(w<v){
+                                if(isVisibleU){
+                                    if(B>=A){
+                                        isVisibleU = false;
+                                    }
+                                }
+                                if(B>=A){
+                                    UP=1;
+                                }else{
+                                    UP++;
+                                }
+                            }
                         }
                         j++;
                     }
                     w++;
                 }
-
+                
                 if(isVisibleL||isVisibleR||isVisibleD||isVisibleU){
                     count++;
                 }
+                sum=UP*DW*LT*RT;
+                if(sum>BestScore){BestScore=sum;}
                 i++;
             }
             v++;
         }
         System.out.println("[PART 1] Total number of visible trees="+count);
+        System.out.println("[PART 2] Best Scenic score possible="+BestScore);
     }
 }
 
