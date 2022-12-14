@@ -3,11 +3,9 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Map {
-    File file;
 
     public ArrayList<String> Mapper(File file){
         ArrayList<String> map=new ArrayList<>();
-        this.file=file;
 
         try {
             Scanner sc = new Scanner(file);
@@ -21,7 +19,29 @@ public class Map {
 
         return map;
     }
+
+    public ArrayList<ArrayList<Integer>> iMapper(File file) {
+        ArrayList<ArrayList<Integer>>imap=new ArrayList<>();
+
+        try {
+            Scanner sc = new Scanner(file);
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                ArrayList<Integer> string=new ArrayList<>();
+                for(char ch: line.toCharArray()){
+                    int i=ch-48;
+                    string.add(i);
+                }
+                imap.add(string);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return imap;
+    }
 }
+
 
 
 import java.util.ArrayList;
@@ -94,20 +114,72 @@ public class Viewer {
         System.out.println("[PART 1] Total number of visible trees="+count);
         System.out.println("[PART 2] Best Scenic score possible="+BestScore);
     }
+    
+    public void isVisibleFOREACH(ArrayList<ArrayList<Integer>>imap){
+        int count=0;
+
+        int v=0;
+        for(ArrayList<Integer> line:imap){
+            int i=0;
+            for(int A: line){
+                boolean isVisibleL=true;
+                boolean isVisibleR=true;
+                boolean isVisibleU=true;
+                boolean isVisibleD=true;
+                int j=0;
+                for(int B:line){
+                    if(j>i&&B>=A){
+                        isVisibleR=false;
+                    }
+                    if(j<i&&B>=A){
+                        isVisibleL=false;
+                    }
+                    j++;
+                }
+
+                int w=0;
+                for(ArrayList<Integer> vline:imap){
+                    j=0;
+                    for(int B:vline){
+                        if(i==j&&w>v&&B>=A){
+                            isVisibleD=false;
+                        }
+                        if(i==j&&w<v&&B>=A){
+                            isVisibleU=false;
+                        }
+                        j++;
+                    }
+                    w++;
+                }
+
+                if(isVisibleL||isVisibleR||isVisibleD||isVisibleU){
+                    count++;
+                }
+                i++;
+            }
+            v++;
+        }
+        System.out.println("[PART 1] Total number of visible trees="+count);
+    }
 }
 
 
 import java.io.File;
 import java.util.ArrayList;
 
+import java.io.File;
+import java.util.ArrayList;
+
 public class Main {
     public static void main(String[] args) {
-        File file=new File("[PATH FILE]\\Map.txt");
+        File file=new File("C:\\Users\\LeoNe\\IdeaProjects\\AdventOfCode22_day8\\Map.txt");
         Map mapper=new Map();
         ArrayList<String> map;
         map=mapper.Mapper(file);
         Viewer viewer=new Viewer();
         viewer.isVisible(map);
-
+        ArrayList<ArrayList<Integer>>imap;
+        imap=mapper.iMapper(file);
+        viewer.isVisibleFOREACH(imap);
     }
 }
