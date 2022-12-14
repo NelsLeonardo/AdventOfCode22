@@ -219,7 +219,8 @@ public class Main {
         map=mapper.Mapper(file);
         Viewer viewer=new Viewer();
         viewer.isVisible(map);
-        ArrayList<ArrayList<Integer>>imap;
+        
+        ArrayList<ArrayList<Integer>>imap;  //this section is needed only fo the FOREACHONLY version of the code
         imap=mapper.iMapper(file);
         viewer.isVisibleFOREACH(imap);
     }
