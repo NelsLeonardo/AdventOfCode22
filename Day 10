@@ -1,0 +1,94 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+import static java.lang.Character.isDigit;
+
+public class clockCircuit {
+    int cycle=0;
+    int X=1;
+    int signal=0;
+    ArrayList<Integer> CYCLES=new ArrayList<>();
+    char[] crt=new char[40];
+    int printptr=0;
+
+    public clockCircuit(){
+        for(int i=0; i<1000; i++){
+            CYCLES.add(0);
+        }
+    }
+
+    public void signalStrength(){
+        if((cycle-20)%40==0||cycle==20){
+            signal+=cycle*X;
+        }
+    }
+    public void signal(File file){
+        try {
+            Scanner sc = new Scanner(file);
+
+            while(sc.hasNextLine()){
+                String line=sc.nextLine();
+                int N=0;
+                if(line.charAt(0)=='n'){
+                    N=1;
+                }
+                if(line.charAt(0)=='a'){
+                    N=2;
+                    int length=line.length();
+                    boolean neg=false;
+                    int value=0;
+                    for(int i=5; i<length; i++){
+                        if(!isDigit(line.charAt(i))){
+                            if(line.charAt(i)!='-'){System.out.println("Error not a number or not '-' ("+line.charAt(i)+")");}
+                            neg=true;
+                        }else {
+                            value *= 10;
+                            value += line.charAt(i) - 48;
+                        }
+                    }
+                    if(neg){value*=-1;}
+                    CYCLES.set(cycle+2, value);
+                }
+                for(int i=0; i<N;i++){
+                    X+=CYCLES.get(cycle); CRT();
+                    cycle++; signalStrength();
+                }
+            }
+
+            System.out.println("[PART 1] Sum of signal strengths="+signal);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void CRT(){
+        //System.out.println(/*cycle+" "+X*/printptr);
+
+        if(printptr>=X-1&&printptr<=X+1){
+            crt[printptr]='#';
+        }else {
+            crt[printptr]='.';
+        }
+
+        if(printptr==39) {
+            String print = new String(crt);
+            System.out.println(print);
+            printptr=0;
+        }else {
+            printptr++;
+        }
+    }
+}
+
+
+import java.io.File;
+
+public class Main {
+    public static void main(String[] args) {
+        File file=new File("[FILE PATH]\\Puzzle.txt");
+        clockCircuit Device=new clockCircuit();
+        Device.signal(file);
+    }
+}
