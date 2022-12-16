@@ -10,13 +10,13 @@ import static java.lang.Character.isDigit;
 
 public class Monkey {
 
-    int inspectedTime=0;
+    Long inspectedTime=0L;
     String old_new;
-    int divisible=0;
+    Long divisible=0L;
     int ifTrueMonkey=0;
     int ifFalseMonkey=0;
 
-    Queue<BigInteger>items;
+    Queue<Long>items;
 
     public Monkey(ArrayList<String> lines){
         items=new LinkedList<>();
@@ -26,28 +26,36 @@ public class Monkey {
                     old_new=line;
                 }
             }
-            int X = 0;
+            Long X = 0L;
             for (char ch : line.toCharArray()) {
                 if (isDigit(ch)) {
                     X *= 10;
                     X += ch-48;
                 }
                 if(ch==','&&lines.indexOf(line)==1){
-                    items.add(BigInteger.valueOf(X));
-                    X=0;
+                    items.add(X);
+                    X=0L;
                 }
             }
             if(lines.indexOf(line)==1) {
-                items.add(BigInteger.valueOf(X));
+                items.add(X);
             }
             if(lines.indexOf(line)==3) {
                 divisible=X;
             }
+
+            int Y = 0;
+            for (char ch : line.toCharArray()) {
+                if (isDigit(ch)) {
+                    Y *= 10;
+                    Y += ch-48;
+                }
+            }
             if(lines.indexOf(line)==4) {
-                ifTrueMonkey=X;
+                ifTrueMonkey=Y;
             }
             if(lines.indexOf(line)==5) {
-                ifFalseMonkey=X;
+                ifFalseMonkey=Y;
             }
         }
     }
@@ -63,7 +71,7 @@ import java.util.Scanner;
 import static java.lang.Character.isDigit;
 
 public class Worriedlvl {
-    public void worried(File file, int Round, int warringlvl) {
+    public void worried(File file, int Round, int worringlvl) {
         ArrayList<Monkey> Monkeys = new ArrayList<>();
         ArrayList<String> lines = new ArrayList<>();
 
@@ -87,14 +95,20 @@ public class Worriedlvl {
             Monkey monkey = new Monkey(lines);
             Monkeys.add(monkey);
             //all Monkeys have been created
-            for (int r = 0; r < Round; r++) {
+
+            Long MagicNumber=1L;
+            for(Monkey M :Monkeys) {
+                MagicNumber *= M.divisible;
+            }
+
+            for (int r = 1; r <= Round; r++) {
                 for (Monkey M : Monkeys) {
-                    BigInteger value = BigInteger.valueOf(0);
+                    Long value = 0L;
                     int size = M.items.size();
                     for (int k = 0; k < size; k++) {
                         if (M.items.peek() != null) {
                             value = M.items.poll();
-                            System.out.println("Monkey inspects an item with a worry level of " + value);
+                            //System.out.println("Monkey inspects an item with a worry level of " + value);
                             M.inspectedTime++;
                         }
                         //Monkey inspects an item
@@ -117,36 +131,39 @@ public class Worriedlvl {
                                     }
                                     //System.out.println("X="+X);
                                     if (ch == '+') {
-                                        value=value.add(BigInteger.valueOf(X));
+                                        value+=X;
                                     } else {  //ch=='*'
-                                        value = value.multiply(BigInteger.valueOf(X));
+                                        value *= X;
                                     }
-                                    System.out.println("    Worry level is multiplied by " + X + " to " + value);
+                                    //System.out.println("    Worry level is multiplied by " + X + " to " + value);
                                 }
                                 i = 2;
                                 if (!isDigit(M.old_new.charAt(index + i))) {
                                     if (ch == '+') {
-                                        value=value.add(value);
+                                        value+=value;
                                     } else {  //ch=='*'
-                                        value = value.multiply(value);
+                                        value *= value;
 
                                     }
                                 }
                             }
                         }
                         //Monkey inspects an item
-                        value=value.divide(BigInteger.valueOf(warringlvl));
-                        System.out.println("    Monkey gets bored with item. Worry level is divided by " + warringlvl + " to " + value);
+                        value/=worringlvl;
+                        if(worringlvl==1){
+                            value%=MagicNumber;
+                        }
+                        //System.out.println("    Monkey gets bored with item. Worry level is divided by " + warringlvl + " to " + value);
                         //Monkey gets bored with item. Worry level is divided by 3
-                        if (value.remainder(BigInteger.valueOf(M.divisible)) == BigInteger.valueOf(0)) {
-                            System.out.println("    Current worry level is divisible by " + M.divisible);
-                            System.out.println("    Item with worry level " + value + " is thrown to monkey " + M.ifTrueMonkey);
+                        if (value%M.divisible==0) {
+                            //System.out.println("    Current worry level is divisible by " + M.divisible);
+                            //System.out.println("    Item with worry level " + value + " is thrown to monkey " + M.ifTrueMonkey);
                             Monkey tmp = Monkeys.get(M.ifTrueMonkey);
                             tmp.items.add(value);
                             Monkeys.set(M.ifTrueMonkey, tmp);
                         } else {
-                            System.out.println("    Current worry level is not divisible by " + M.divisible);
-                            System.out.println("    Item with worry level " + value + " is thrown to monkey " + M.ifFalseMonkey);
+                            //System.out.println("    Current worry level is not divisible by " + M.divisible);
+                            //System.out.println("    Item with worry level " + value + " is thrown to monkey " + M.ifFalseMonkey);
                             Monkey tmp = Monkeys.get(M.ifFalseMonkey);
                             tmp.items.add(value);
                             Monkeys.set(M.ifFalseMonkey, tmp);
@@ -155,11 +172,11 @@ public class Worriedlvl {
                 }
             }
 
-            int Best = 0;
+            Long Best = 0L;
             for (Monkey A : Monkeys) {
                 for (Monkey B : Monkeys) {
                     if (A != B) {
-                        int sum = A.inspectedTime * B.inspectedTime;
+                        Long sum = A.inspectedTime * B.inspectedTime;
                         if (Best < sum) {
                             Best = sum;
                         }
@@ -167,7 +184,7 @@ public class Worriedlvl {
                 }
             }
 
-            System.out.println("[PART 1] The level of monkey business: " + Best);
+            System.out.println("The level of monkey business: " + Best);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -175,12 +192,16 @@ public class Worriedlvl {
 
 }
 
+
 import java.io.File;
 
 public class Main {
     public static void main(String[] args) {
-        File file=new File("[FILE PATH]\\Test.txt");
+        File file=new File("C:\\Users\\LeoNe\\IdeaProjects\\AdventOfCode22_day11\\Puzzle.txt");
         Worriedlvl worriedlvl=new Worriedlvl();
+        System.out.print("[PART 1] ");
         worriedlvl.worried(file, 20, 3);
+        System.out.print("[PART 2] ");
+        worriedlvl.worried(file, 10000, 1);
     }
 }
