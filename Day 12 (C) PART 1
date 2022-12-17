@@ -12,37 +12,33 @@ int climberRec(int** map, int* R, int* C, int r, int c) {
 	int UP = 0, DW = 0, LT = 0, RT = 0;
 
 	if (r != 0) {
-		if (map[r - 1][c] == 69 && map[r][c] == 122) { /*printf("trovato!\n");*/ return sol = 1; }
+		if (map[r - 1][c] == 69 && map[r][c] == 122) { return sol = 1; }
 		if (map[r - 1][c] - map[r][c] == 1 || map[r][c] - map[r - 1][c] == 0) {
 			map[r][c] -= 60;
-			printf("proseguo in %c\n", map[r - 1][c]);
 			UP = climberRec(map, R, C, r - 1, c);
 			map[r][c] += 60;
 		}
 	}
 	if (r + 1 < *R) {
-		if (map[r + 1][c] == 69 && map[r][c] == 122) { /*printf("trovato!\n");*/ return sol = 1; }
+		if (map[r + 1][c] == 69 && map[r][c] == 122) { return sol = 1; }
 		if (map[r + 1][c] - map[r][c] == 1 || map[r][c] - map[r + 1][c] == 0) {
 			map[r][c] -= 60;
-			printf("proseguo in %c\n", map[r + 1][c]);
 			DW = climberRec(map, R, C, r + 1, c);
 			map[r][c] += 60;
 		}
 	}
 	if (c != 0) {
-		if (map[r][c - 1] == 69 && map[r][c] == 122) { /*printf("trovato!\n");*/ return sol = 1; }
+		if (map[r][c - 1] == 69 && map[r][c] == 122) { return sol = 1; }
 		if (map[r][c - 1] - map[r][c] == 1 || map[r][c] - map[r][c - 1] == 0) {
 			map[r][c] -= 60;
-			printf("proseguo in %c\n", map[r][c-1]);
 			LT = climberRec(map, R, C, r, c - 1);
 			map[r][c] += 60;
 		}
 	}
 	if (c + 1 < *C) {
-		if (map[r][c + 1] == 69 && map[r][c] == 122) { /*printf("trovato!\n");*/ return sol = 1; }
+		if (map[r][c + 1] == 69 && map[r][c] == 122) { return sol = 1; }
 		if (map[r][c + 1] - map[r][c] == 1 || map[r][c] - map[r][c + 1] == 0) {
 			map[r][c] -= 60;
-			printf("proseguo in %c\n", map[r][c + 1]);
 			RT = climberRec(map, R, C, r, c + 1);
 			map[r][c] += 60;
 		}
