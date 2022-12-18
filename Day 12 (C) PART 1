@@ -1,7 +1,7 @@
 //https://adventofcode.com/2022/day/12
 
-_____________________________________FROM_END_TO_START
-_____MAKEFILE
+
+:MAKEFILE:
 cc=gcc
 CFLAGS= -std=c11
 
@@ -11,7 +11,8 @@ all:$(BIN)
 %: %.c
         $(CC) $(CFLAGS) -o $@ $<
 
-_____MAIN.C
+
+:MAIN.C:
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -19,267 +20,154 @@ _____MAIN.C
 #include <unistd.h>
 #include <sys/wait.h>
 
-int climberRec(int** map, int* R, int* C, int r, int c) {
+#define infinite 9999
 
-        int sol = 0;
-        int UP = 0, DW = 0, LT = 0, RT = 0;
+void climberRec(int** map, int** cost, int X, int Y) {
 
-        int pid, status, ret, pidchild;
-        bool UPchild = false; bool DWchild = false; bool LTchild = false; bool RTchild = false;
-
-        if (r != 0) {
-                if (map[r - 1][c] == 'S' && map[r][c] == 'a') { /*printf("trovato!\n");*/ return sol = 1; }
-                if (map[r][c] - map[r-1][c] == 1 || map[r][c] - map[r - 1][c] == 0) {
-                        printf("proseguo in %c\n", map[r - 1][c]);
-                        UPchild = true;
-                        if ((pid = fork()) < 0) { printf("error during the UP fork\n"); exit(-1); }
-                        if (pid == 0) {
-                        //child
-                                map[r][c] -= 60;
-                                UP = climberRec(map, R, C, r - 1, c);
-                                map[r][c] += 60;
-                                exit(UP);
-                        }
-                }
-        }
-        if (r + 1 < *R) {
-                if (map[r + 1][c] == 'S' && map[r][c] == 'a') { /*printf("trovato!\n");*/ return sol = 1; }
-                if (map[r][c] - map[r+1][c] == 1 || map[r][c] - map[r + 1][c] == 0) {
-                        printf("proseguo in %c\n", map[r + 1][c]);
-                        DWchild = true;
-                        if ((pid = fork()) < 0) { printf("error during the DW fork\n"); exit(-1); }
-                        if (pid == 0) {
-                        //child
-                                map[r][c] -= 60;
-                                DW = climberRec(map, R, C, r + 1, c);
-                                map[r][c] += 60;
-                                exit(DW);
-                        }
-                }
-        }
-        if (c != 0) {
-                if (map[r][c - 1] == 'S' && map[r][c] == 'a') { /*printf("trovato!\n");*/ return sol = 1; }
-                if (map[r][c] - map[r][c-1] == 1 || map[r][c] - map[r][c - 1] == 0) {
-                        LTchild = true;
-                        printf("proseguo in %c\n", map[r][c - 1]);
-                        if ((pid = fork()) < 0) { printf("error during the LT fork\n"); exit(-1); }
-                        if (pid == 0) {
-                        //child
-                                map[r][c] -= 60;
-                                LT = climberRec(map, R, C, r, c - 1);
-                                map[r][c] += 60;
-                                exit(LT);
-                        }
-                }
-        }
-        if (c + 1 < *C) {
-                if (map[r][c + 1] == 'S' && map[r][c] == 'a') { /*printf("trovato!\n");*/ return sol = 1; }
-                if (map[r][c] - map[r][c+1] == 1 || map[r][c] - map[r][c + 1] == 0) {
-                        RTchild = true;
-                        if ((pid = fork()) < 0) { printf("error during the RT fork\n"); exit(-1); }
-                        if (pid == 0) {
-                                //child
-                                map[r][c] -= 60;
-                                printf("proseguo in %c\n", map[r][c + 1]);
-                                RT = climberRec(map, R, C, r, c + 1);
-                                map[r][c] += 60;
-                                exit(RT);
-                        }
-                }
-        }
-
-        if (UPchild) { UPchild = false; if ((pidchild = wait(&status)) < 0) { printf("error waiting the UP child\n"); exit(-1); }if ((status & 0xff) != 0) { printf("UPchild arrested!\n"); exit(-1); } else { UP = ((status >> 8) & 0xFF); } }
-        if (DWchild) { DWchild = false; if ((pidchild = wait(&status)) < 0) { printf("error waiting the DW child\n"); exit(-1); }if ((status & 0xff) != 0) { printf("DWchild arrested!\n"); exit(-1); } else { DW = ((status >> 8) & 0xFF); } }
-        if (LTchild) { LTchild = false; if ((pidchild = wait(&status)) < 0) { printf("error waiting the LT child\n"); exit(-1); }if ((status & 0xff) != 0) { printf("LTchild arrested!\n"); exit(-1); } else { LT = ((status >> 8) & 0xFF); } }
-        if (RTchild) { RTchild = false; if ((pidchild = wait(&status)) < 0) { printf("error waiting the RT child\n"); exit(-1); }if ((status & 0xff) != 0) { printf("RTchild arrested!\n"); exit(-1); } else { RT = ((status >> 8) & 0xFF); } }
-
-        if (map[r][c] == 'E') {
-                if (r != 0 && map[r - 1][c] == 'z') {
-                        UP = climberRec(map, R, C, r - 1, c); }
-                if (r + 1 < *R && map[r + 1][c] == 'z') {
-                        DW = climberRec(map, R, C, r + 1, c); }
-                if (c != 0 && map[r][c - 1] == 'z') {
-                        LT = climberRec(map, R, C, r, c - 1); }
-                if (c + 1 < *C && map[r][c + 1] == 'z') {
-                        RT = climberRec(map, R, C, r, c + 1); }
-        }
-
-        if (UP != 0 || DW != 0 || LT != 0 || RT != 0) {
-                if (UP + DW + LT + RT == UP) { return UP + 1; }
-                if (UP + DW + LT + RT == DW) { return DW + 1; }
-                if (UP + DW + LT + RT == LT) { return LT + 1; }
-                if (UP + DW + LT + RT == RT) { return RT + 1; }
-                //else
-                int check[4] = { UP, DW, LT, RT };
-                sol = 9999;
-                for (int i = 0; i < 4; i++) {
-                        if (check[i] != 0 && check[i] < sol) { sol = check[i]; }
-                }
-                sol++;
-        }
-
-        return sol;
-}
-
-int** mapper(int* fd, int* N, int* L) {
-        char ch;
-        int** map;
-        int n = 0; int l = 0;
-        int sol = 0;
-
-        //recreating the map matrix
-        bool lined = false;
-        while (read(*fd, &ch, 1)) {
-                if (!lined) n++;
-                if (ch == '\n') {
-                        l++;
-                        lined = true;
-                }
-        }
-        *N = n;
-        *L = l;
-        lseek(*fd, 0, SEEK_SET);
-        map = (int**)malloc(*L * sizeof(int*));
-        for (int i = 0; i < *L; i++) {
-                map[i] = (int*)malloc(*N * sizeof(int));
-        }
-        int r = 0, c = 0;
-        while (read(*fd, &ch, 1)) {
-                if (c==n-1) { r++; c = 0; if (read(*fd, &ch, 1) != 1) { break; } }
-                map[r][c] = ch;
-                c++;
-        }
-
-        return map;
-}
-
-void climber(int* fd) {
-
-        int* N; int n = 0; N = &n;
-        int* L; int l = 0; L = &l;
-        int** map = mapper(fd, N, L);
-
-        int sol = 0;
-        for (int i = 0; i < *L; i++) {
-
-
-                for (int j = 0; j < *N; j++) {
-                        if (map[i][j] == 'E') {
-                                sol = climberRec(map, L, N, i, j);
-                                printf("%d\n", sol);
-                        }
-                }
-        }
-
-        //printf("%d\n", sol);
-}
-
-int main(int argc, char** argv) {
-
-        int fd;
-
-        if (argc != 2) { printf("error: wrong number of parameters\n"); exit(2); }
-        if ((fd = open(argv[1], O_RDONLY)) < 0) { printf("error: unable to open the file %s\n", argv[1]); exit(2); }
-
-        climber(&fd);
-
-        return 0;
-}
-_____________________________________FROM_START_TO_END
-#include <stdlib.h>
-#include <stdio.h>
-#include <fcntl.h>
-#include <stdbool.h>
-
-int climberRec(int** map, int* R, int* C, int r, int c) {
-
-	int sol = 0;
-	int UP = 0, DW = 0, LT = 0, RT = 0;
-
-	if (r != 0) {
-		if (map[r - 1][c] == 69 && map[r][c] == 122) { return sol = 1; }
-		if (map[r - 1][c] - map[r][c] == 1 || map[r][c] - map[r - 1][c] == 0) {
-			map[r][c] -= 60;
-			UP = climberRec(map, R, C, r - 1, c);
-			map[r][c] += 60;
+	bool sorted = false;
+	while (!sorted) {
+		sorted = true;
+		for (int y = 0; y < Y; y++) {
+			if (!sorted) { break; }
+			for (int x = 0; x < X; x++) {
+				if (cost[x][y] == infinite) { sorted = false; }
+			}
+		}
+		if (!sorted) {
+			for (int y = 0; y < Y; y++) {
+				for (int x = 0; x < X; x++) {
+					if (map[x][y] == 'S') {
+						if (x != 0) {
+							//left
+							if (map[x - 1][y] == 'a') {
+								cost[x - 1][y] = 1;
+							}
+						}
+						if (x < X - 1) {
+							//right
+							if (map[x + 1][y] == 'a') {
+								cost[x + 1][y] = 1;
+							}
+						}
+						if (y != 0) {
+							//up
+							if (map[x][y - 1] == 'a') {
+								cost[x][y - 1] = 1;
+							}
+						}
+						if (y < Y - 1) {
+							//down
+							if (map[x][y + 1] == 'a') {
+								cost[x][y + 1] = 1;
+							}
+						}
+					}
+					if (map[x][y] == 'z') {
+						if (x != 0) {
+							//left
+							if (map[x - 1][y] == 'E') {
+								cost[x - 1][y] = cost[x][y]+1;
+							}
+						}
+						if (x < X - 1) {
+							//right
+							if (map[x + 1][y] == 'E') {
+								cost[x + 1][y] = cost[x][y] + 1;
+							}
+						}
+						if (y != 0) {
+							//up
+							if (map[x][y - 1] == 'E') {
+								cost[x][y - 1] = cost[x][y] + 1;
+							}
+						}
+						if (y < Y - 1) {
+							//down
+							if (map[x][y + 1] == 'E') {
+								cost[x][y + 1] = cost[x][y] + 1;
+							}
+						}
+					}
+					if (cost[x][y] != infinite) {
+						if (x != 0) {
+							//left
+							if (map[x][y] - map[x - 1][y] == 0 || map[x][y] - map[x - 1][y] == -1) {
+								if (cost[x - 1][y] > cost[x][y] + 1) { cost[x - 1][y] = cost[x][y] + 1; }
+							}
+						}
+						if (x < X - 1) {
+							//right
+							if (map[x][y] - map[x + 1][y] == 0 || map[x][y] - map[x + 1][y] == -1) {
+								if (cost[x + 1][y] > cost[x][y] + 1) { cost[x + 1][y] = cost[x][y] + 1; }
+							}
+						}
+						if (y != 0) {
+							//up
+							if (map[x][y] - map[x][y - 1] == 0 || map[x][y] - map[x][y - 1] == -1) {
+								if (cost[x][y - 1] > cost[x][y] + 1) { cost[x][y - 1] = cost[x][y] + 1; }
+							}
+						}
+						if (y < Y - 1) {
+							//down
+							if (map[x][y] - map[x][y + 1] == 0 || map[x][y] - map[x][y + 1] == -1) {
+								if (cost[x][y + 1] > cost[x][y] + 1) { cost[x][y + 1] = cost[x][y] + 1; }
+							}
+						}
+					}
+				}
+			}
+			for (int y = 0; y < Y; y++) {
+				for (int x = 0; x < X; x++) {
+					if (cost[x][y] == infinite) { printf(". "); }
+					else { printf("%c%d ", map[x][y], cost[x][y]); }
+				}
+				printf("\n");
+			}
+			//for (int y = 0; y < Y; y++) {
+			//	for (int x = 0; x < X; x++) {
+			//		if (map[x][y] == 'r') {
+			//			printf("[PART 1] solution: %d\n", cost[x][y]);
+			//		}
+			//	}
+			//}
 		}
 	}
-	if (r + 1 < *R) {
-		if (map[r + 1][c] == 69 && map[r][c] == 122) { return sol = 1; }
-		if (map[r + 1][c] - map[r][c] == 1 || map[r][c] - map[r + 1][c] == 0) {
-			map[r][c] -= 60;
-			DW = climberRec(map, R, C, r + 1, c);
-			map[r][c] += 60;
-		}
-	}
-	if (c != 0) {
-		if (map[r][c - 1] == 69 && map[r][c] == 122) { return sol = 1; }
-		if (map[r][c - 1] - map[r][c] == 1 || map[r][c] - map[r][c - 1] == 0) {
-			map[r][c] -= 60;
-			LT = climberRec(map, R, C, r, c - 1);
-			map[r][c] += 60;
-		}
-	}
-	if (c + 1 < *C) {
-		if (map[r][c + 1] == 69 && map[r][c] == 122) { return sol = 1; }
-		if (map[r][c + 1] - map[r][c] == 1 || map[r][c] - map[r][c + 1] == 0) {
-			map[r][c] -= 60;
-			RT = climberRec(map, R, C, r, c + 1);
-			map[r][c] += 60;
-		}
-	}
-
-	if (map[r][c] == 'S') {
-		if (r != 0) { UP = climberRec(map, R, C, r - 1, c); }
-		if (r + 1 < *R) { DW = climberRec(map, R, C, r + 1, c); }
-		if (c != 0) { LT = climberRec(map, R, C, r, c - 1); }
-		if (c + 1 < *C) { RT = climberRec(map, R, C, r, c + 1); }
-	}
-
-	if (UP != 0 || DW != 0 || LT != 0 || RT != 0) {
-		if (UP + DW + LT + RT == UP) { return UP + 1; }
-		if (UP + DW + LT + RT == DW) { return DW + 1; }
-		if (UP + DW + LT + RT == LT) { return LT + 1; }
-		if (UP + DW + LT + RT == RT) { return RT + 1; }
-		//else
-		int check[4] = { UP, DW, LT, RT };
-		sol = 9999;
-		for (int i = 0; i < 4; i++) {
-			if (check[i] != 0 && check[i] < sol) { sol = check[i]; }
-		}
-		sol++;
-	}
-
-	return sol;
 }
 
-int** mapper(int* fd, int* N, int* L) {
+int** mapper(int* fd, int* C, int* L, bool cost) {
 	char ch;
 	int** map;
-	int n = 0; int l = 0;
-	int sol = 0;
+	int c = 0; int l = 0;
 
 	//recreating the map matrix
 	bool lined = false;
-	while (read(fd, &ch, 1)) {
-		if (!lined) n++;
+	while (read(*fd, &ch, 1)) {
+		if (!lined) c++;
 		if (ch == '\n') {
 			l++;
 			lined = true;
 		}
 	}
-	*N = n;
+	c--;	//need to ignore the '\n' character
+	*C = c;
 	*L = l;
-	lseek(fd, 0, SEEK_SET);
-	map = (int**)malloc(*L * sizeof(int*));
-	for (int i = 0; i < *L; i++) {
-		map[i] = (int*)malloc(*N * sizeof(int));
+
+	//printf("%dx%d\n", l, c);
+
+	lseek(*fd, 0, SEEK_SET);
+	map = (int**)malloc(*C * sizeof(int*));
+	for (int i = 0; i < *C; i++) {
+		map[i] = (int*)malloc(*L * sizeof(int));
 	}
-	int r = 0, c = 0;
-	while (read(fd, &ch, 1)) {
-		if (c==n-1) { r++; c = 0; if (read(fd, &ch, 1) != 1) { break; } }
-		map[r][c] = ch;
-		c++;
+	
+	int x = 0, y = 0;
+	while (read(*fd, &ch, 1)) {
+		if (ch == '\n') { x = 0; y++; if ((read(*fd, &ch, 1)) != 1) break; }
+		if (cost) { map[x][y] = infinite; }
+		else {
+			map[x][y] = ch;
+		}
+		x++;
 	}
 
 	return map;
@@ -287,23 +175,37 @@ int** mapper(int* fd, int* N, int* L) {
 
 void climber(int* fd) {
 	
-	int* N; int n = 0; N = &n;
+	int* C; int c = 0; C = &c;
 	int* L; int l = 0; L = &l;
-	int** map = mapper(fd, N, L);
+	int** map = mapper(fd, C, L, false);
+	lseek(*fd, 0, SEEK_SET);
+	int** cost = mapper(fd, C, L, true);
 
-	int sol = 0;
-	for (int i = 0; i < *L; i++) {
-
-
-		for (int j = 0; j < *N; j++) {
-			if (map[i][j] == 'S') {
-				sol = climberRec(map, L, N, i, j);
-				printf("%d\n", sol);
+	for (int x = 0; x < *C; x++) {
+		for (int y = 0; y < *L; y++) {
+			if (map[x][y] == 'S') {
+				cost[x][y] = 0;
 			}
 		}
 	}
 
-	printf("%d\n", sol);
+	climberRec(map, cost, c, l);
+
+	for (int y = 0; y < *L; y++) {
+		for (int x = 0; x < *C; x++) {
+			if (cost[x][y] == infinite) { printf(". "); }
+			else { printf("%c%d ", map[x][y], cost[x][y]); }
+		}
+		printf("\n");
+	}
+
+	for (int y = 0; y < *L; y++) {
+		for (int x = 0; x < *C; x++) {
+			if (map[x][y] == 'E') {
+				printf("[PART 1] solution: %d\n", cost[x][y]);
+			}
+		}
+	}
 }
 
 int main(int argc, char** argv) {
@@ -311,9 +213,9 @@ int main(int argc, char** argv) {
 	int fd;
 
 	if (argc != 2) { printf("error: wrong number of parameters\n"); exit(2); }
-	if ((fd = open(argv[1], O_RDONLY)) < 0) { printf("error: unable to open the file %s\n", *argv[1]); exit(2); }
+	if ((fd = open(argv[1], O_RDONLY)) < 0) { printf("error: unable to open the file %s\n", argv[1]); exit(2); }
 
-	climber(fd);
+	climber(&fd);
 
 	return 0;
 }
