@@ -26,45 +26,48 @@ void climberRec(int** map, int** cost, int X, int Y) {
 
 	bool sorted = false;
 	while (!sorted) {
+		//check every position from 0,0 to X,Y
 		for (int y = 0; y < Y; y++) {
 			for (int x = 0; x < X; x++) {
-				if (map[x][y] == 'S') {
+				//if x,y is our start position
+				if (map[x][y] == 'E') {
 					if (x != 0) {
 						//left
-						if (map[x - 1][y] == 'a') {
+						if (map[x - 1][y] == 'z') {
 							cost[x - 1][y] = 1;
 						}
 					}
 					if (x < X - 1) {
 						//right
-						if (map[x + 1][y] == 'a') {
+						if (map[x + 1][y] == 'z') {
 							cost[x + 1][y] = 1;
 						}
 					}
 					if (y != 0) {
 						//up
-						if (map[x][y - 1] == 'a') {
+						if (map[x][y - 1] == 'z') {
 							cost[x][y - 1] = 1;
 						}
 					}
 					if (y < Y - 1) {
 						//down
-						if (map[x][y + 1] == 'a') {
+						if (map[x][y + 1] == 'z') {
 							cost[x][y + 1] = 1;
 						}
 					}
 				}
-				if (map[x][y] == 'z'&cost[x][y]!=infinite) {
+				//check if we are near our end position
+				if (map[x][y] == 'a'&cost[x][y]!=infinite) {
 					if (x != 0) {
 						//left
-						if (map[x - 1][y] == 'E') {
+						if (map[x - 1][y] == 'S') {
 							cost[x - 1][y] = cost[x][y] + 1;
 							sorted = true;
 						}
 					}
 					if (x < X - 1) {
 						//right
-						if (map[x + 1][y] == 'E') {
+						if (map[x + 1][y] == 'S') {
 							cost[x + 1][y] = cost[x][y] + 1;
 							sorted = true;
 
@@ -72,7 +75,7 @@ void climberRec(int** map, int** cost, int X, int Y) {
 					}
 					if (y != 0) {
 						//up
-						if (map[x][y - 1] == 'E') {
+						if (map[x][y - 1] == 'S') {
 							cost[x][y - 1] = cost[x][y] + 1;
 							sorted = true;
 
@@ -80,56 +83,42 @@ void climberRec(int** map, int** cost, int X, int Y) {
 					}
 					if (y < Y - 1) {
 						//down
-						if (map[x][y + 1] == 'E') {
+						if (map[x][y + 1] == 'S') {
 							cost[x][y + 1] = cost[x][y] + 1;
 							sorted = true;
 
 						}
 					}
 				}
+				//update the distance cost of every positio possible
 				if (cost[x][y] != infinite) {
 					if (x != 0) {
 						//left
-						if (map[x - 1][y] - map[x][y] <=1&& map[x - 1][y] - map[x][y] >=-26) {
+						if (map[x][y] - map[x - 1][y] <=1&& map[x][y] - map[x - 1][y] >= -26) {
 							if (cost[x - 1][y] > cost[x][y] + 1) { cost[x - 1][y] = cost[x][y] + 1; }
 						}
 					}
 					if (x < X - 1) {
 						//right
-						if (map[x + 1][y] - map[x][y] <= 1 && map[x + 1][y] - map[x][y] >=-26) {
+						if (map[x][y] - map[x + 1][y] <= 1 && map[x][y] - map[x + 1][y] >=-26) {
 							if (cost[x + 1][y] > cost[x][y] + 1) { cost[x + 1][y] = cost[x][y] + 1; }
 						}
 					}
 					if (y != 0) {
 						//up
-						if (map[x][y-1] - map[x][y] <= 1 && map[x][y - 1] - map[x][y]>=-26) {
+						if (map[x][y] - map[x][y - 1] <= 1 && map[x][y] - map[x][y - 1] >=-26) {
 							if (cost[x][y - 1] > cost[x][y] + 1) { cost[x][y - 1] = cost[x][y] + 1; }
 						}
 					}
 					if (y < Y - 1) {
 						//down
-						if (map[x][y+1] - map[x][y] <= 1 && map[x][y + 1] - map[x][y]>=-26) {
+						if (map[x][y] - map[x][y + 1] <= 1 && map[x][y] - map[x][y + 1] >=-26) {
 							if (cost[x][y + 1] > cost[x][y] + 1) { cost[x][y + 1] = cost[x][y] + 1; }
 						}
 					}
 				}
 			}
 		}
-		//for (int y = 0; y < Y; y++) {
-		//	for (int x = 0; x < X; x++) {
-		//		if (cost[x][y] == infinite) { printf(". "); }
-		//		else { printf("%c%d ", map[x][y], cost[x][y]); }
-		//	}
-		//	printf("\n");
-		//}
-		//for (int y = 0; y < Y; y++) {
-		//	for (int x = 0; x < X; x++) {
-		//		if (map[x][y] == 'z') {
-		//			printf("%c: %d\n",map[x][y], cost[x][y]);
-		//		}
-		//	}
-		//}
-		//printf("\n");
 	}
 }
 
@@ -174,46 +163,49 @@ int** mapper(int* fd, int* C, int* L, bool cost) {
 
 void climber(int* fd) {
 	
+	//we need to create 2 matrix (one for the map and one for the cost) using the 'mapper' method
+	//tecnically we could simply use the file instead of the map matrix, but is easier with the map matrix
 	int* C; int c = 0; C = &c;
 	int* L; int l = 0; L = &l;
 	int** map = mapper(fd, C, L, false);
 	lseek(*fd, 0, SEEK_SET);
 	int** cost = mapper(fd, C, L, true);
 
+	//inside the cost matrix set the End cost to 0 (we are going End to Start)
 	for (int x = 0; x < *C; x++) {
 		for (int y = 0; y < *L; y++) {
-			if (map[x][y] == 'S') {
+			if (map[x][y] == 'E') {
 				cost[x][y] = 0;
 			}
 		}
 	}
 
+	//calling last method
 	climberRec(map, cost, c, l);
 
+	//printing solutions
+	//for the first part the solution is the cost in start position ('S'), the distance between End and Start
+	//for the second part is even easier: the solution is the 'a' with the lower cost (with the lower distance from End)
+	int Part2 = infinite;
 	for (int y = 0; y < *L; y++) {
 		for (int x = 0; x < *C; x++) {
-			if (cost[x][y] == infinite) { printf(". "); }
-			else { printf("%c%d ", map[x][y], cost[x][y]); }
-		}
-		printf("\n");
-	}
-
-	for (int y = 0; y < *L; y++) {
-		for (int x = 0; x < *C; x++) {
-			if (map[x][y] == 'E') {
+			if (map[x][y] == 'a' && cost[x][y] < Part2) { Part2 = cost[x][y]; }
+			if (map[x][y] == 'S') {
 				printf("[PART 1] solution: %d\n", cost[x][y]);
 			}
 		}
 	}
+	printf("[PART 2] solution: %d\n", Part2);
 }
 
 int main(int argc, char** argv) {
 
 	int fd;
-
+	//params check
 	if (argc != 2) { printf("error: wrong number of parameters\n"); exit(2); }
+	//try to open the file given
 	if ((fd = open(argv[1], O_RDONLY)) < 0) { printf("error: unable to open the file %s\n", argv[1]); exit(2); }
-
+	//call the climber method
 	climber(&fd);
 
 	return 0;
