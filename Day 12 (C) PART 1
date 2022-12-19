@@ -26,111 +26,110 @@ void climberRec(int** map, int** cost, int X, int Y) {
 
 	bool sorted = false;
 	while (!sorted) {
-		sorted = true;
 		for (int y = 0; y < Y; y++) {
-			if (!sorted) { break; }
 			for (int x = 0; x < X; x++) {
-				if (cost[x][y] == infinite) { sorted = false; }
-			}
-		}
-		if (!sorted) {
-			for (int y = 0; y < Y; y++) {
-				for (int x = 0; x < X; x++) {
-					if (map[x][y] == 'S') {
-						if (x != 0) {
-							//left
-							if (map[x - 1][y] == 'a') {
-								cost[x - 1][y] = 1;
-							}
-						}
-						if (x < X - 1) {
-							//right
-							if (map[x + 1][y] == 'a') {
-								cost[x + 1][y] = 1;
-							}
-						}
-						if (y != 0) {
-							//up
-							if (map[x][y - 1] == 'a') {
-								cost[x][y - 1] = 1;
-							}
-						}
-						if (y < Y - 1) {
-							//down
-							if (map[x][y + 1] == 'a') {
-								cost[x][y + 1] = 1;
-							}
+				if (map[x][y] == 'S') {
+					if (x != 0) {
+						//left
+						if (map[x - 1][y] == 'a') {
+							cost[x - 1][y] = 1;
 						}
 					}
-					if (map[x][y] == 'z') {
-						if (x != 0) {
-							//left
-							if (map[x - 1][y] == 'E') {
-								cost[x - 1][y] = cost[x][y]+1;
-							}
-						}
-						if (x < X - 1) {
-							//right
-							if (map[x + 1][y] == 'E') {
-								cost[x + 1][y] = cost[x][y] + 1;
-							}
-						}
-						if (y != 0) {
-							//up
-							if (map[x][y - 1] == 'E') {
-								cost[x][y - 1] = cost[x][y] + 1;
-							}
-						}
-						if (y < Y - 1) {
-							//down
-							if (map[x][y + 1] == 'E') {
-								cost[x][y + 1] = cost[x][y] + 1;
-							}
+					if (x < X - 1) {
+						//right
+						if (map[x + 1][y] == 'a') {
+							cost[x + 1][y] = 1;
 						}
 					}
-					if (cost[x][y] != infinite) {
-						if (x != 0) {
-							//left
-							if (map[x][y] - map[x - 1][y] == 0 || map[x][y] - map[x - 1][y] == -1) {
-								if (cost[x - 1][y] > cost[x][y] + 1) { cost[x - 1][y] = cost[x][y] + 1; }
-							}
+					if (y != 0) {
+						//up
+						if (map[x][y - 1] == 'a') {
+							cost[x][y - 1] = 1;
 						}
-						if (x < X - 1) {
-							//right
-							if (map[x][y] - map[x + 1][y] == 0 || map[x][y] - map[x + 1][y] == -1) {
-								if (cost[x + 1][y] > cost[x][y] + 1) { cost[x + 1][y] = cost[x][y] + 1; }
-							}
+					}
+					if (y < Y - 1) {
+						//down
+						if (map[x][y + 1] == 'a') {
+							cost[x][y + 1] = 1;
 						}
-						if (y != 0) {
-							//up
-							if (map[x][y] - map[x][y - 1] == 0 || map[x][y] - map[x][y - 1] == -1) {
-								if (cost[x][y - 1] > cost[x][y] + 1) { cost[x][y - 1] = cost[x][y] + 1; }
-							}
+					}
+				}
+				if (map[x][y] == 'z'&cost[x][y]!=infinite) {
+					if (x != 0) {
+						//left
+						if (map[x - 1][y] == 'E') {
+							cost[x - 1][y] = cost[x][y] + 1;
+							sorted = true;
 						}
-						if (y < Y - 1) {
-							//down
-							if (map[x][y] - map[x][y + 1] == 0 || map[x][y] - map[x][y + 1] == -1) {
-								if (cost[x][y + 1] > cost[x][y] + 1) { cost[x][y + 1] = cost[x][y] + 1; }
-							}
+					}
+					if (x < X - 1) {
+						//right
+						if (map[x + 1][y] == 'E') {
+							cost[x + 1][y] = cost[x][y] + 1;
+							sorted = true;
+
+						}
+					}
+					if (y != 0) {
+						//up
+						if (map[x][y - 1] == 'E') {
+							cost[x][y - 1] = cost[x][y] + 1;
+							sorted = true;
+
+						}
+					}
+					if (y < Y - 1) {
+						//down
+						if (map[x][y + 1] == 'E') {
+							cost[x][y + 1] = cost[x][y] + 1;
+							sorted = true;
+
+						}
+					}
+				}
+				if (cost[x][y] != infinite) {
+					if (x != 0) {
+						//left
+						if (map[x - 1][y] - map[x][y] <=1&& map[x - 1][y] - map[x][y] >=-26) {
+							if (cost[x - 1][y] > cost[x][y] + 1) { cost[x - 1][y] = cost[x][y] + 1; }
+						}
+					}
+					if (x < X - 1) {
+						//right
+						if (map[x + 1][y] - map[x][y] <= 1 && map[x + 1][y] - map[x][y] >=-26) {
+							if (cost[x + 1][y] > cost[x][y] + 1) { cost[x + 1][y] = cost[x][y] + 1; }
+						}
+					}
+					if (y != 0) {
+						//up
+						if (map[x][y-1] - map[x][y] <= 1 && map[x][y - 1] - map[x][y]>=-26) {
+							if (cost[x][y - 1] > cost[x][y] + 1) { cost[x][y - 1] = cost[x][y] + 1; }
+						}
+					}
+					if (y < Y - 1) {
+						//down
+						if (map[x][y+1] - map[x][y] <= 1 && map[x][y + 1] - map[x][y]>=-26) {
+							if (cost[x][y + 1] > cost[x][y] + 1) { cost[x][y + 1] = cost[x][y] + 1; }
 						}
 					}
 				}
 			}
-			for (int y = 0; y < Y; y++) {
-				for (int x = 0; x < X; x++) {
-					if (cost[x][y] == infinite) { printf(". "); }
-					else { printf("%c%d ", map[x][y], cost[x][y]); }
-				}
-				printf("\n");
-			}
-			//for (int y = 0; y < Y; y++) {
-			//	for (int x = 0; x < X; x++) {
-			//		if (map[x][y] == 'r') {
-			//			printf("[PART 1] solution: %d\n", cost[x][y]);
-			//		}
-			//	}
-			//}
 		}
+		//for (int y = 0; y < Y; y++) {
+		//	for (int x = 0; x < X; x++) {
+		//		if (cost[x][y] == infinite) { printf(". "); }
+		//		else { printf("%c%d ", map[x][y], cost[x][y]); }
+		//	}
+		//	printf("\n");
+		//}
+		//for (int y = 0; y < Y; y++) {
+		//	for (int x = 0; x < X; x++) {
+		//		if (map[x][y] == 'z') {
+		//			printf("%c: %d\n",map[x][y], cost[x][y]);
+		//		}
+		//	}
+		//}
+		//printf("\n");
 	}
 }
 
